@@ -1,2 +1,2 @@
 # MyArkanoidPython
-My implementation of the Arkanoid game
+My implementation of the Arkanoid game on Python
