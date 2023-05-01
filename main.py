@@ -12,11 +12,11 @@ class GameLogic:
         x = self.field_width // 2
         y = self.field_height // 2 + self.field_height // 4
         self.platform = [[x - 2, y], [x - 1, y], [x, y], [x + 1, y], [x + 2, y]]
-        self.ball = [randint(0, self.field_width), y - 5]       ##########################################
-        self.ball_dir = [1, -1]      #####################################################################
+        self.ball = [randint(0, self.field_width), y - 5]
+        self.ball_dir = [1, -1]
         self.bricks = [[1] * 5 for _ in range(self.field_width)]
         self.game_over = False
-        self.game_won = False       #####################################################################
+        self.game_won = False
         self.timer = 0
         self.score = 0
         self.max_score = max_score
@@ -26,10 +26,10 @@ class GameLogic:
         y = self.field_height // 2 + self.field_height // 4
         self.platform = [[x - 2, y], [x - 1, y], [x, y], [x + 1, y], [x + 2, y]]
         self.ball = [randint(0, self.field_width), y - 5]
-        self.ball_dir = [1, -1]      #####################################################################
+        self.ball_dir = [1, -1]
         self.bricks = [[1] * 5 for _ in range(self.field_width)]
         self.game_over = False
-        self.game_won = False       #####################################################################
+        self.game_won = False
         self.timer = 0
         self.score = 0
         print(f'Max score is {self.max_score}!')
@@ -41,6 +41,8 @@ class GameLogic:
         self.draw_score()
         if self.game_over:
             self.draw_game_over()
+        if self.game_won:
+            self.draw_game_won()
 
     def draw_platform(self):
         for index, square in enumerate(self.platform):
@@ -67,6 +69,11 @@ class GameLogic:
                                          (255, 0, 0))
         self.app.screen.blit(img, (200, 200))
 
+    def draw_game_won(self):  # метод прорисовки заставки "Игра окончена"
+        img = self.app.score_font.render(f'You win! Congratulations! Max record is {self.max_score}', True,
+                                         (255, 0, 0))
+        self.app.screen.blit(img, (200, 200))
+
     def move_left(self):
         if self.platform[0][0] > 0:
             for i in range(5):
@@ -77,8 +84,13 @@ class GameLogic:
             for i in range(5):
                 self.platform[i][0] += 1
 
-    def update(self):       ##################################################
-        if self.game_over:
+    def update(self):
+        if self.score == 75:
+            self.game_won = True
+            if self.score > self.max_score:
+                self.max_score = self.score
+
+        if self.game_over or self.game_won:
             return
 
         self.timer += self.app.dt
@@ -145,7 +157,7 @@ class App:
             if e.type == pg.QUIT or (e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE):
                 pg.quit()  # прекращаем работу с pygame
                 sys.exit()  # закрываем окно
-            if self.logic.game_over:  # если игра проиграна (смотри строку №41)
+            if self.logic.game_over or self.logic.game_won:  # если игра проиграна (смотри строку №41)
                 if e.type == pg.KEYDOWN:  # если какая-то клавиша нажата
                     # TODO: save records
                     self.logic.restart()
