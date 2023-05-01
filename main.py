@@ -25,7 +25,7 @@ class GameLogic:
         x = self.field_width // 2
         y = self.field_height // 2 + self.field_height // 4
         self.platform = [[x - 2, y], [x - 1, y], [x, y], [x + 1, y], [x + 2, y]]
-        self.ball = [x, y - 5]
+        self.ball = [randint(0, self.field_width), y - 5]
         self.ball_dir = [1, -1]      #####################################################################
         self.bricks = [[1] * 5 for _ in range(self.field_width)]
         self.game_over = False
