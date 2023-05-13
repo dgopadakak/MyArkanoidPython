@@ -17,6 +17,7 @@ class GameLogic:
         self.bricks = [[1] * 5 for _ in range(self.field_width)]
         self.game_over = False
         self.game_won = False
+        self.game_paused = False
         self.timer = 0
         self.score = 0
         self.max_score = max_score
@@ -43,6 +44,8 @@ class GameLogic:
             self.draw_game_over()
         if self.game_won:
             self.draw_game_won()
+        if self.game_paused:
+            self.draw_game_paused()
 
     def draw_platform(self):
         for index, square in enumerate(self.platform):
@@ -67,12 +70,17 @@ class GameLogic:
     def draw_game_over(self):  # метод прорисовки заставки "Игра окончена"
         img = self.app.score_font.render(f'You lose scoring {self.score}. Max record is {self.max_score}', True,
                                          (255, 0, 0))
-        self.app.screen.blit(img, (200, 200))
+        self.app.screen.blit(img, (450, 450))
 
     def draw_game_won(self):  # метод прорисовки заставки "Игра окончена"
         img = self.app.score_font.render(f'You win! Congratulations! Max record is {self.max_score}', True,
-                                         (255, 0, 0))
-        self.app.screen.blit(img, (200, 200))
+                                         (50, 200, 50))
+        self.app.screen.blit(img, (400, 450))
+
+    def draw_game_paused(self):
+        img = self.app.score_font.render(f'Game on pause, press ESC for resume', True,
+                                         (255, 255, 255))
+        self.app.screen.blit(img, (450, 450))
 
     def move_left(self):
         if self.platform[0][0] > 0:
@@ -85,6 +93,9 @@ class GameLogic:
                 self.platform[i][0] += 1
 
     def update(self):
+        if self.game_paused:
+            return
+
         if self.score == 75:
             self.game_won = True
             if self.score > self.max_score:
@@ -154,9 +165,14 @@ class App:
 
     def check_events(self):
         for e in pg.event.get():
-            if e.type == pg.QUIT or (e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE):
+            if e.type == pg.QUIT:
                 pg.quit()  # прекращаем работу с pygame
                 sys.exit()  # закрываем окно
+            if e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
+                if self.logic.game_paused:
+                    self.logic.game_paused = False
+                else:
+                    self.logic.game_paused = True
             if self.logic.game_over or self.logic.game_won:  # если игра проиграна (смотри строку №41)
                 if e.type == pg.KEYDOWN:  # если какая-то клавиша нажата
                     # TODO: save records
